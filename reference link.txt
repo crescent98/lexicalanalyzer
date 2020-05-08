@@ -1,1 +1,5 @@
 https://araikuma.tistory.com/532
+how to distinguish between identifier & variable type:
+https://stackoverflow.com/questions/26864261/how-can-dfa-nfa-recognize-the-difference-between-identifiers-and-keywords
+Compiler Design : Lexical Analysis (Yonsei University CS Course):
+https://jgtonys.github.io/school/2018/10/14/compiler-design-lexical-analysis/
