@@ -13,8 +13,6 @@ Original file is located at
 Signed Integer & Float-Point Number
 """
 import sys
-print(sys.argv)
-
 #dictionary 형식으로 DFA 구현
 T_SI=[{1: 1,2: 3, 3: 2,},
       {1: -1, 2: -1, 3: 4},
@@ -27,6 +25,8 @@ T_SI=[{1: 1,2: 3, 3: 2,},
 #signed_integer scanner
 def si_scanner(input):
   t_state=0
+  t_temp=0
+  token_temp=[]
   for i in range(0,len(input)):
     char_temp=0
     if input[i]=='-':
@@ -36,10 +36,35 @@ def si_scanner(input):
     elif input[i].isdigit()==True:
       char_temp=3
     else:
+      if t_temp==4 or t_temp==3 or t_temp==2 or t_temp==6 or t_temp==5:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]
       return -1
     t_state=T_SI[t_state][char_temp]
-  if t_state==4 or t_state==3 or t_state==2 or t_state==6 or t_state==5:
-    print("<INTEGER,",input,">")
+    if t_state==-1:
+      if t_temp==4 or t_temp==3 or t_temp==2 or t_temp==6 or t_temp==5:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              print(token_temp[j]+token_temp2)
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]
+    if t_state==4 or t_state==3 or t_state==2 or t_state==6 or t_state==5:
+      token_temp.append([input[0:i+1],input[i+1:len(input)]])
+    t_temp=t_state
   return t_state
 
 #float point number
@@ -56,6 +81,8 @@ T_FP=[{1: 1, 2: 2, 3: 3, 4: -1},
 
 def fp_scanner(input):
   t_state=0
+  t_temp=0
+  token_temp=[]
   for i in range(0,len(input)):
     char_temp=0
     if input[i]=='-':
@@ -66,11 +93,41 @@ def fp_scanner(input):
       char_temp=3
     elif input[i]=='.':
       char_temp=4
-    else:
+    else: #들어가면 안 되는 input이 들어간 경우
+      if t_temp==7 or t_temp==8:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]
+       # if mini_scanner(token_temp[0][1])!=-1:
       return -1
     t_state=T_FP[t_state][char_temp]
-  if t_state==7 or t_state==8:
-    print("<FLOAT,",input,">")
+    if t_state!=7 and t_state!=8:
+      if t_temp==7 or t_temp==8:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]
+      if t_state==-1:
+        return -1
+    if t_state==7 or t_state==8:
+      token_temp.append([input[0:i+1],input[i+1:len(input)]])
+    t_temp=t_state
+
+  if t_state==-1:
+    return -1
   return t_state
 
 """Identifier Scanner"""
@@ -88,25 +145,47 @@ T_ID=[{1: 1, 2: -1, 3: 2},
 #identifier
 def id_scanner(input):
   t_state=0
+  t_temp=0
+  token_temp=[]
   for i in range(0,len(input)):
     char_temp=0
     if input[i]=='_':
       char_temp=1
-      print("_")
     elif input[i].isdigit()==True:
       char_temp=2
     elif input[i].isalpha()==True:
       char_temp=3
     else:
+      if t_temp==1 or t_temp==2 or t_temp==3 or t_temp==4 or t_temp==5 or t_temp==6 or t_temp==7 or t_temp==8:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]      
       return -1
     t_state=T_ID[t_state][char_temp]
     if t_state==-1:
+      if t_temp==1 or t_temp==2 or t_temp==3 or t_temp==4 or t_temp==5 or t_temp==6 or t_temp==7 or t_temp==8:
+        for j in range(len(token_temp)-1,-1,-1):
+          if mini_scanner(token_temp[j][-1])==-1: #결국 망한 경우
+            continue
+          elif mini_scanner(token_temp[j][-1])!=-1: #made it!
+            if type(mini_scanner(token_temp[j][-1]))==list:
+              token_temp2=mini_scanner(token_temp[j][-1])
+              del token_temp[j][-1]
+              return token_temp[j]+token_temp2
+            else:
+              return token_temp[j]
       return -1
-  if t_state==1 or t_state==2 or t_state==3 or t_state==4 or t_state==5 or t_state==6 or t_state==7 or t_state==8:
-    print("<ID,",input,">")
-    return t_state
-  else:
-    return t_state
+    t_temp=t_state
+    if t_state==1 or t_state==2 or t_state==3 or t_state==4 or t_state==5 or t_state==6 or t_state==7 or t_state==8:
+      token_temp.append([input[0:i+1],input[i+1:len(input)]])
+  return t_state
 
 """Operator Scanner"""
 
@@ -146,8 +225,8 @@ def op_scanner(input):
     t_state=T_OP[t_state][char_temp]
     if t_state==-1:
       return -1
-  if t_state==1 or t_state==2 or t_state==3 or t_state==6 or t_state==7 or t_state==8 or t_state==9 or t_state==10 or t_state==11 or t_state==12:
-    print("<OP,",input,">")
+  if t_state==1 or t_state==2 or t_state==3 or t_state==6 or t_state==7 or t_state==8 or t_state==9 or t_state==10 or t_state==11 or t_state==12 or t_state==4:
+    #print("<OP,",input,">")
     return t_state
   else:
     return t_state
@@ -180,7 +259,7 @@ def kw_scanner(input):
   if t_state==-1:
     return -1
   if t_state==1 or t_state==2 or t_state==3 or t_state==4 or t_state==5:
-    print("<KEYWORD,",input,">")
+    #print("<KEYWORD,",input,">")
     return t_state
 
 
@@ -207,7 +286,7 @@ def vt_scanner(input):
   if t_state==-1:
     return -1
   if t_state==1 or t_state==2 or t_state==3 or t_state==4:
-    print("<VARTYPE,",input,">")
+    #print("<VARTYPE,",input,">")
     return t_state
 
 """Literal String & Boolean String Scanner"""
@@ -236,7 +315,7 @@ def ls_scanner(input):
       return -1
     t_state=T_LS[t_state][char_temp]
   if t_state==5:
-    print("<LITERAL STRING,",input,">")
+    #print("<LITERAL STRING,",input,">")
     return t_state
   else:
     return -1
@@ -256,10 +335,10 @@ def bs_scanner(input):
     return -1
   t_state=T_BS[t_state][char_temp]
   if t_state==1:
-    print("<BOOLSTR,TRUE")
+    #print("<BOOLSTR,TRUE")
     return t_state
   elif t_state==2:
-    print("<BOOLSTR,FALSE>")
+    #print("<BOOLSTR,FALSE>")
     return t_state
   else:
     return t_state
@@ -293,22 +372,22 @@ def sm_scanner(input):
     return -1
   t_state=T_SM[t_state][temp_char]
   if t_state==1:
-    print("SEMMICOLON")
+    #print("SEMMICOLON")
     return t_state
   elif t_state==2:
-    print("LBRACE")
+    #print("LBRACE")
     return t_state
   elif t_state==3:
-    print("RBRACE")
+    #print("RBRACE")
     return t_state
   elif t_state==4:
-    print("LPAREN")
+    #print("LPAREN")
     return t_state
   elif t_state==5:
-    print("RPAREN")
+    #print("RPAREN")
     return t_state
   elif t_state==6:
-    print("COMMA")
+    #print("COMMA")
     return t_state
 
 """Arithmetic Operator Scanner"""
@@ -338,16 +417,16 @@ def os_scanner(input):
     return -1
   t_state=T_OS[t_state][temp_char]
   if t_state==1:
-    print("<OP,",input,">")
+    #print("<OP,",input,">")
     return t_state
   elif t_state==2:
-    print("<OP,",input,">")
+    #print("<OP,",input,">")
     return t_state
   elif t_state==3:
-    print("<OP,",input,">")
+    #print("<OP,",input,">")
     return t_state
   elif t_state==4:
-    print("<OP,",input,">")
+    #print("<OP,",input,">")
     return t_state
 
 """# *Text Parsing & Scanning*"""
@@ -383,9 +462,9 @@ def token_parser(input):
         temp=list_str[i].split(temp_char,1)
         for j in range(len(temp)-1,-1,-1):
           list_str.insert(i,temp[j])
-          print("insert",temp[j])
+          #print("insert",temp[j])
         list_str.insert(i+1,temp_char)
-        print("insert temp_char",temp_char)
+        #print("insert temp_char",temp_char)
         del list_str[i+3]
         i=i+1
       i=i+1
@@ -421,29 +500,230 @@ def token_parser(input):
         list_str.insert(i+2,temp[-1])
         del list_str[i+3]
         i=i+1
+      #elif temp
       else:
         list_str.insert(i+1,'-'+temp[-1])
         del list_str[i+2]
         i=i+1    
     i=i+1
-  #추가로 뒤에 붙은 것이 무엇인지에 따라 나뉘게 됨
+   #exception -> if there is space inside " "
+  i=0
   list_str=[v for v in list_str if v]
+  while(i<len(list_str)):
+    if list_str[i].find('\"')!=-1:    # " 확인
+      for j in range(i+1,len(list_str)):
+        if list_str[j].find('\"')!=-1: # 다음 "까지 조사
+          temp_sum=""
+          for k in range(i+1,j+1):
+            temp_sum=temp_sum+' '+list_str[k] # 문자열 병합
+          temp_sum=list_str[i]+temp_sum
+          list_str.insert(i,temp_sum)
+          k_temp=i+1
+          for k in range(i+1,j+2):
+            del list_str[k_temp]
+          i=i+1
+          break
+    i=i+1
+  #추가로 뒤에 붙은 것이 무엇인지에 따라 나뉘게 됨
   return(list_str)
-  #problem if there is lot's of operators/symbols superimposed -> interation
+  #problem if there is lot's of operators/symbols superimposed -> iteration
 
-input="0.0 3 0.00 -0.3 4 3--1"
-token_temp=token_parser(input)
-print("token is",token_temp)
-for i in range(0,len(token_temp)):
-  print(i,"th token: ",token_temp[i])
-  op_scanner(token_temp[i])
-  ls_scanner(token_temp[i])
-  bs_scanner(token_temp[i])
-  sm_scanner(token_temp[i])
-  os_scanner(token_temp[i])
-  fp_scanner(token_temp[i])
-  si_scanner(token_temp[i])
-  #variable type -> keyword -> id
-  vt_scanner(token_temp[i])
-  kw_scanner(token_temp[i])
-  id_scanner(token_temp[i])
+
+##Scanner Function
+ 
+def scanner(input):
+    if op_scanner(input)==1 or op_scanner(input)==2 or op_scanner(input)==3 or \
+        op_scanner(input)==4 or op_scanner(input)==6 or op_scanner(input)==7 or \
+        op_scanner(input)==8 or op_scanner(input)==9 or op_scanner(input)==10 or \
+        op_scanner(input)==11 or op_scanner(input)==12:
+      data_temp='<OPERATOR,'+input+'>\n'
+      return(data_temp)     
+    elif ls_scanner(input)==5:
+      data_temp='<LITERAL STRING,'+input+'>\n'
+      return(data_temp)          
+    elif bs_scanner(input)==1 or bs_scanner(input)==2:
+      if bs_scanner(input)==1:
+        data_temp='<BOOLEAN STRING,TRUE>\n'
+      else:
+        data_temp='<BOOELAN STRING, FALSE>\n'
+      return(data_temp)    
+    elif sm_scanner(input)==1 or sm_scanner(input)==2 or \
+        sm_scanner(input)==3 or sm_scanner(input)==4 or \
+        sm_scanner(input)==5 or sm_scanner(input)==6:
+      if sm_scanner(input)==1:
+        data_temp='<SYMBOL, SEMMICOLON>\n'
+      elif sm_scanner(input)==2:
+        data_temp='<SYMBOL, LBRACE>\n'
+      elif sm_scanner(input)==3:
+        data_temp='<SYMBOL, RBRACE>\n'
+      elif sm_scanner(input)==4:
+        data_temp='<SYMBOL, LPAREN>\n'
+      elif sm_scanner(input)==5:
+        data_temp='<SYMBOL, RPAREN>\n'
+      elif sm_scanner(input)==6:
+        data_temp='<SYMBOL, COMMA>\n'
+      return(data_temp)
+    elif os_scanner(input)==1 or os_scanner(input)==2 or \
+         os_scanner(input)==3 or os_scanner(input)==4:
+      data_temp='<ARITHMETIC OPERATOR,'+input+'>\n'
+      return(data_temp)
+    elif fp_scanner(input)==7 or fp_scanner(input)==8:
+      data_temp='<FLOATING POINT,'+input+'>\n'
+      return(data_temp) 
+    elif si_scanner(input)==1 or si_scanner(input)==2 or \
+         si_scanner(input)==3 or si_scanner(input)==4 or \
+         si_scanner(input)==5 or si_scanner(input)==6 or \
+         si_scanner(input)==7:
+      data_temp='<SIGNED INTEGER,'+input+'>\n'
+      return(data_temp)
+    elif vt_scanner(input)==1 or vt_scanner(input)==2 or \
+            vt_scanner(input)==3 or vt_scanner(input)==4:
+      if vt_scanner(input)==1:
+        data_temp='<INT>\n'
+      elif vt_scanner(input)==2:
+        data_temp='<CHAR>\n'
+      elif vt_scanner(input)==3:
+        data_temp='<BOOL>\n'
+      elif vt_scanner(input)==4:
+        data_temp='<FLOAT>\n'
+      return(data_temp)
+    elif kw_scanner(input)==1 or kw_scanner(input)==2 or \
+         kw_scanner(input)==3 or kw_scanner(input)==4 or \
+         kw_scanner(input)==5:
+      if kw_scanner(input)==1:
+        data_temp='<KEYWORD, IF>\n'
+      elif kw_scanner(input)==2:
+        data_temp='<KEYWORD, ELSE>\n'
+      elif kw_scanner(input)==3:
+        data_temp='<KEYWORD, WHILE>\n'
+      elif kw_scanner(input)==4:
+        data_temp='<KEYWORD, FOR>\n'
+      elif kw_scanner(input)==5:
+        data_temp='<KEYWORD, RETURN>\n'
+      return(data_temp)
+    elif id_scanner(input)==1 or id_scanner(input)==2 or \
+         id_scanner(input)==3 or id_scanner(input)==4 or \
+         id_scanner(input)==5 or id_scanner(input)==6 or \
+         id_scanner(input)==7 or id_scanner(input)==8:
+      data_temp='<ID,'+input+'>\n'
+      return(data_temp)
+    elif type(fp_scanner(input))==list:
+      return fp_scanner(input)
+    elif type(si_scanner(input))==list:
+      return si_scanner(input)
+    elif type(id_scanner(input))==list:
+      return id_scanner(input)
+    else:
+      return(-1)
+        
+ 
+ 
+def mini_scanner(input):
+    if fp_scanner(input)==7 or fp_scanner(input)==8:
+      data_temp='<FLOATING POINT,'+input+'>\n'
+      return(data_temp) 
+    elif si_scanner(input)==1 or si_scanner(input)==2 or \
+         si_scanner(input)==3 or si_scanner(input)==4 or \
+         si_scanner(input)==5 or si_scanner(input)==6 or \
+         si_scanner(input)==7:
+      data_temp='<SIGNED INTEGER,'+input+'>\n'
+      return(data_temp)
+    elif vt_scanner(input)==1 or vt_scanner(input)==2 or \
+            vt_scanner(input)==3 or vt_scanner(input)==4:
+      if vt_scanner(input)==1:
+        data_temp='<INT>\n'
+      elif vt_scanner(input)==2:
+        data_temp='<CHAR>\n'
+      elif vt_scanner(input)==3:
+        data_temp='<BOOL>\n'
+      elif vt_scanner(input)==4:
+        data_temp='<FLOAT>\n'
+      return(data_temp)
+    elif bs_scanner(input)==1 or bs_scanner(input)==2:
+      if bs_scanner(input)==1:
+        data_temp='<BOOLEAN STRING,TRUE\n>'
+      else:
+        data_Temp='<BOOELAN STRING, FALSE\n>'
+      return(data_temp)   
+    elif kw_scanner(input)==1 or kw_scanner(input)==2 or \
+         kw_scanner(input)==3 or kw_scanner(input)==4 or \
+         kw_scanner(input)==5:
+      if kw_scanner(input)==1:
+        data_temp='<KEYWORD, IF>\n'
+      elif kw_scanner(input)==2:
+        data_temp='<KEYWORD, ELSE>\n'
+      elif kw_scanner(input)==3:
+        data_temp='<KEYWORD, WHILE>\n'
+      elif kw_scanner(input)==4:
+        data_temp='<KEYWORD, FOR>\n'
+      elif kw_scanner(input)==5:
+        data_temp='<KEYWORD, RETURN>\n'
+      return(data_temp)
+    elif id_scanner(input)==1 or id_scanner(input)==2 or \
+         id_scanner(input)==3 or id_scanner(input)==4 or \
+         id_scanner(input)==5 or id_scanner(input)==6 or \
+         id_scanner(input)==7 or id_scanner(input)==8:
+      data_temp='<ID,'+input+'>\n'
+      return(data_temp)
+    #other cases
+    elif type(fp_scanner(input))==list:
+      return fp_scanner(input)
+    elif type(si_scanner(input))==list:
+      return si_scanner(input)
+    elif type(id_scanner(input))==list:
+      return id_scanner(input)
+    else:
+      return(-1)
+
+
+#file I/O
+f= open(sys.argv[1],'r')
+input=f.readlines()
+f.close()
+f=open(f"{sys.argv[1]}.out",'w')
+
+for i in range(0,len(input)):
+  token_temp=token_parser(input[i])
+  print()
+  print()
+  print(i,"th line is",token_temp)
+  print()
+  for j in range(0,len(token_temp)):
+    print(j,"th token: ",token_temp[j])
+    op_scanner(token_temp[j])
+    ls_scanner(token_temp[j])
+    bs_scanner(token_temp[j])
+    sm_scanner(token_temp[j])
+    os_scanner(token_temp[j])
+    fp_scanner(token_temp[j])
+    si_scanner(token_temp[j])
+    #variable type -> keyword -> id
+    vt_scanner(token_temp[j])
+    kw_scanner(token_temp[j])
+    id_scanner(token_temp[j])
+
+  
+print("\n\n Writing in the File\n\n")  
+  
+for i in range(0,len(input)): #줄이 바뀔 일은 없으니까 고정
+  token_temp=token_parser(input[i])
+  j=0
+  while(j<len(token_temp)):
+    data_temp=scanner(token_temp[j])
+    if token_temp[j]=='-0':
+      token_temp.insert(j,'0')
+      token_temp.insert(j,'-')
+      del token_temp[j+2]
+      continue
+    elif data_temp==-1:
+      data_temp="Lexical Error at"+str(i)+"th line"+str(j)+"\'th token:    "+token_temp[j]
+      f.writelines(data_temp)
+      exit()
+    elif type(data_temp)==list:
+      for k in range(len(data_temp)-1,-1,-1):
+        token_temp.insert(j,data_temp[k])
+      del token_temp[j+len(data_temp)]
+      continue
+    f.writelines(data_temp)
+    j=j+1
+
